@@ -107,7 +107,6 @@ def get_all_social(name):
         
     return twitter, instagram, facebook
 
-
 ## ESPN GET TEAMS AND ID ##
 def get_teams():
     the_data = []
@@ -121,25 +120,19 @@ def get_teams():
         i+=1
      
     the_data=json.dumps(the_data)
-    save_to_json(team, the_data)
+    save_to_json("teams", the_data)
     print (the_data)
-   
-   
+     
 ## ESPN GET PLAYERS AND GOOGLE SEARCH SOCIAL MEDIA ##
 def get_players():
     the_data = []
-    # response = requests.get('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/15/roster', headers=espn_headers)
-    # data = response.json()
-    # team=data['team']['displayName']
-    # print(team)
     i=1
-
     ## LOOP THROUGH 30 TEAMS ##
     while i <= 30: 
         response = requests.get('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+ str(i) + '/roster', headers=espn_headers)
         data = response.json()
         team=data['team']['displayName']
-        print(team)
+        print("Getting data for " + team)
         for value in data['athletes']:
             name=value['fullName']
             position=value['position']['abbreviation']
@@ -151,8 +144,7 @@ def get_players():
         the_data=json.dumps(the_data)
         save_to_json(team, the_data)
         the_data = []
-        i+=1
-        
+        i+=1       
     
 ## SAVE ALL PLAYER DATA INCLUDING SOCIAL MEDIA ACCOUNTS TO JSON ##
 def save_to_json(team, data):
@@ -168,8 +160,6 @@ def save_to_json(team, data):
     file = open(fullpath, 'w')
     file.write(data)
     file.close()
-    print("Saved "+ team + " file")
+    print("Saved " + filename )
     
-
-   
 get_players()
