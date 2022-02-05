@@ -44,10 +44,6 @@ espn_headers = {
     'accept-language': 'en,en-CA;q=0.9,en-US;q=0.8,bn;q=0.7',
 }
 
-## LIST OF TEAMS AND CORRESPONDING IDS FOR ESPN ##
-teams='[{"id": 1, "team": "Atlanta Hawks"}, {"id": 2, "team": "Boston Celtics"}, {"id": 3, "team": "New Orleans Pelicans"}, {"id": 4, "team": "Chicago Bulls"}, {"id": 5, "team": "Cleveland Cavaliers"}, {"id": 6, "team": "Dallas Mavericks"}, {"id": 7, "team": "Denver Nuggets"}, {"id": 8, "team": "Detroit Pistons"}, {"id": 9, "team": "Golden State Warriors"}, {"id": 10, "team": "Houston Rockets"}, {"id": 11, "team": "Indiana Pacers"}, {"id": 12, "team": "LA Clippers"}, {"id": 13, "team": "Los Angeles Lakers"}, {"id": 14, "team": "Miami Heat"}, {"id": 15, "team": "Milwaukee Bucks"}, {"id": 16, "team": "Minnesota Timberwolves"}, {"id": 17, "team": "Brooklyn Nets"}, {"id": 18, "team": "New York Knicks"}, {"id": 19, "team": "Orlando Magic"}, {"id": 20, "team": "Philadelphia 76ers"}, {"id": 21, "team": "Phoenix Suns"}, {"id": 22, "team": "Portland Trail Blazers"}, {"id": 23, "team": "Sacramento Kings"}, {"id": 24, "team": "San Antonio Spurs"}, {"id": 25, "team": "Oklahoma City Thunder"}, {"id": 26, "team": "Utah Jazz"}, {"id": 27, "team": "Washington Wizards"}, {"id": 28, "team": "Toronto Raptors"}, {"id": 29, "team": "Memphis Grizzlies"}, {"id": 30, "team": "Charlotte Hornets"}]'
-
-
 ## STANDALONE INSTAGRAM SEARCH ##
 def get_instagram(name):
     player=name.replace(" ", "+")
@@ -81,23 +77,28 @@ def get_all_social(name):
     player=name.replace(" ", "+")
     html = requests.get('https://www.google.com/search?q='+ player +'+nba&hl=en', headers=google_headers)
     response = str(html.text)
+
+    ## REGEX MATCHES FOR SOCIAL MEDIA ##
     twitter = re.search('<g-link class="fl"><a.*\shref="https:\/\/.*twitter.com\/([^"]+)"', response)
     instagram = re.search('<g-link class="fl"><a.*\shref="https:\/\/www.instagram.com\/([^"]+)"', response)
     facebook = re.search('<g-link class="fl"><a.*\shref="https:\/\/www.facebook.com\/([^"]+)"', response)
     
+    ## CHECK IF TWITTER MATCH EXISTS  (IF NOT USE TWITTER STANDALONE FUNCTION FOR ONE MORE CHECK) ##
     if twitter:
         twitter= twitter.group(1)
         twitter = re.sub(r'&amp;.*', '', twitter)
         twitter="https://twitter.com/"+ twitter
     else:
-        twitter=get_twitter(name)
-                 
+        twitter=get_twitter(name) 
+    
+    ## CHECK IF INSTAGRAM MATCH EXISTS  (IF NOT USE INSTAGRAM STANDALONE FUNCTION FOR ONE MORE CHECK) ##            
     if instagram:
         instagram= instagram.group(1)
         instagram="https://www.instagram.com/"+instagram
     else:
         instagram=get_instagram(name)
-        
+    
+    ## CHECK IF FACEBOOK MATCH EXISTS ##    
     if facebook:
         facebook= facebook.group(1)
         facebook="https://www.facebook.com/"+facebook
@@ -132,7 +133,9 @@ def get_players():
     # team=data['team']['displayName']
     # print(team)
     i=1
-    while i <= 30:
+
+    ## LOOP THROUGH 30 TEAMS ##
+    while i <= 30: 
         response = requests.get('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+ str(i) + '/roster', headers=espn_headers)
         data = response.json()
         team=data['team']['displayName']
@@ -144,7 +147,7 @@ def get_players():
             twitter, instagram, facebook= get_all_social(name)
             player_data = {"name": name , "position": position ,"jersey": jersey, "twitter": twitter, "instagram": instagram, "facebook": facebook}
             the_data.append(player_data)
-            time.sleep(10)
+            time.sleep(10) ## ADD SLEEP TO TIMEOUT GOOGLE SEARCH A LITTLE
         the_data=json.dumps(the_data)
         save_to_json(team, the_data)
         the_data = []
