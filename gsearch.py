@@ -115,11 +115,12 @@ def get_teams():
         response = requests.get('https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/'+ str(i) + '/roster', headers=espn_headers)
         data = response.json()
         team=data['team']['displayName']
-        team_data = {"id": i , "team": team}
+        logo=data['team']['logo']
+        team_data = {"id": i , "team": team, "logo": logo}
         the_data.append(team_data)
         i+=1
      
-    the_data=json.dumps(the_data)
+    the_data=json.dumps(the_data, indent=4)
     save_to_json("teams", the_data)
     print (the_data)
      
@@ -137,11 +138,16 @@ def get_players():
             name=value['fullName']
             position=value['position']['abbreviation']
             jersey=value['jersey']
+            try:
+                headshot=value['headshot']['href']
+            except:
+                headshot=""
             twitter, instagram, facebook= get_all_social(name)
-            player_data = {"name": name , "position": position ,"jersey": jersey, "twitter": twitter, "instagram": instagram, "facebook": facebook}
+            player_data = {"name": name , "position": position ,"jersey": jersey, "headshot": headshot, "twitter": twitter, "instagram": instagram, "facebook": facebook}
             the_data.append(player_data)
+            print(player_data)
             time.sleep(10) ## ADD SLEEP TO TIMEOUT GOOGLE SEARCH A LITTLE
-        the_data=json.dumps(the_data)
+        the_data=json.dumps(the_data, indent=4)
         save_to_json(team, the_data)
         the_data = []
         i+=1       
